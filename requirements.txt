@@ -1,0 +1,13 @@
+chromadb
+openai-whisper
+langchain-community
+gpt4all
+gTTS
+keyboard
+pygame
+pydub
+pypdf
+scipy
+numpy
+pyttsx3
+sounddevice
