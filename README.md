@@ -13,8 +13,8 @@ Welcome to the Interactive PDF Chatbot, a smart, AI-driven application that lets
 # Installation
 #### 1. To run this chatbot, you'll need to set up your environment by installing some dependencies.
 
-      - git clone https://github.com/your-repo/pdf-chatbot.git
-      - cd pdf-chatbot
+      - git clone https://github.com/Dhruvvatsa23/Interactive-PDF-chatbot.git
+      - cd Interactive-PDF-chatbot
 
 #### 2. Install Python dependencies: Make sure you have Python installed (version 3.8 or higher), and install the required libraries by running:
 
