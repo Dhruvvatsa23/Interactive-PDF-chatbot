@@ -11,11 +11,11 @@ Welcome to the Interactive PDF Chatbot, a smart, AI-driven application that lets
 #### Interactive Conversations: You can ask questions, and the bot will respond based on the content of the PDF. It can also suggest related topics if it doesn't find a direct answer.
 
 # Installation
-#### Setup ollama
+#### Setup ollama on your machine
 
 - download and setup from: 'https://ollama.com/download'
-- run the following command in the enivronment created:
-      - ollama pull mistral:instruct
+- run the following command in the enivronment created: 'ollama pull mistral:instruct'
+
 #### 1. To run this chatbot, you'll need to set up your environment by installing some dependencies.
 
       - git clone https://github.com/Dhruvvatsa23/Interactive-PDF-chatbot.git
