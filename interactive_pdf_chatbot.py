@@ -27,23 +27,33 @@ collection = chroma_client.get_or_create_collection(name="my_collection")
 
 # Initialize pyttsx3 for text-to-speech
 engine = pyttsx3.init()
-engine.setProperty('rate', 150)  # Adjust speech rate
+engine.setProperty('rate', 200)  # Adjust speech rate                                                                                                                                    
 
 # Global variable for vectorstore
 vectorstore = None
 
 def text_to_speech(text, input_mode):
     if input_mode == "speech":
-        try:
+        try:                                                                                                                                                                                                                                       
             start_time = time.time()
+            print("\nChatbot:", text)  # Add this line to print the response
             engine.say(text)
             engine.runAndWait()
             end_time = time.time()
-            print(f"TTS time: {end_time - start_time:.2f} seconds")
+            print(f"TTS narration time: {end_time - start_time:.2f} seconds")
         except Exception as e:
             print(f"An error occurred during text-to-speech: {e}")
     else:
         print("\nChatbot:", text)
+
+# def get_user_input(input_mode):
+#     if input_mode == "text":
+#         return input("Enter your response (or type 'exit' to end the chat): ")
+#     else:
+#         print("Press and hold spacebar to start recording...")
+#         while not keyboard.is_pressed('space'):
+#             time.sleep(0.1)
+#         return record_and_transcribe()
 
 def get_user_input(input_mode):
     if input_mode == "text":
@@ -52,7 +62,9 @@ def get_user_input(input_mode):
         print("Press and hold spacebar to start recording...")
         while not keyboard.is_pressed('space'):
             time.sleep(0.1)
-        return record_and_transcribe()
+        transcription = record_and_transcribe()
+        # print(f"Debug - Transcribed input: '{transcription}'")  # Debug print
+        return transcription
 
 def record_and_transcribe():
     print("Recording started... Release spacebar to stop.")
@@ -129,18 +141,30 @@ def activate_chatbot(pdf_path):
     input_mode = welcome_message()
     
     llm = ChatOllama(model="mistral:instruct", temperature=0.2, gpu_layers=50)
-    integrated_prompt = PromptTemplate(
-        template="""Based on the following context, answer the question descriptively and engagingly. If the question is not directly related to the context, try to find a relevant connection or suggest a related topic from the context. Provide a natural, conversational response that both answers the question and encourages further discussion.
+    optimized_prompt = PromptTemplate(
+    template="""Analyze the following context and question:
 
-        Context: {context}
-        
-        Question: {question}
-        
-        Response: [Provide a detailed, engaging answer that naturally leads to further conversation]""",
-        input_variables=["context", "question"]
-    )
+Context: {context}
+Question: {question}
+
+Instructions:
+1. If the question is relevant to the context:
+   - Provide a detailed, engaging answer.
+   - Express your own viewpoint or opinion on the topic.
+   - Encourage further discussion by asking a follow-up question or suggesting a related aspect to explore.
+
+2. If the question is not relevant to the context:
+   - Clearly state that it's unrelated to the current content.
+   - Choose a random topic from the context.
+   - Suggest discussing that (random topic from the context) topic instead, asking an engaging question to start the conversation.
+
+Respond in a natural, conversational tone, balancing information with personal insights.
+
+Your response:""",
+    input_variables=["context", "question"]
+)
     
-    chat_with_pdf(vectorstore, llm, integrated_prompt, input_mode, pdf_content)
+    chat_with_pdf(vectorstore, llm, optimized_prompt, input_mode, pdf_content)
 
 def chat_with_pdf(vectorstore, llm, integrated_prompt, input_mode, pdf_content):
     log = []
@@ -152,8 +176,11 @@ def chat_with_pdf(vectorstore, llm, integrated_prompt, input_mode, pdf_content):
         total_start_time = time.time()
         user_question = get_user_input(input_mode)
         
-        if user_question.lower() in ["exit", "quit"]:
+        user_question_lower = user_question.lower().strip()
+        
+        if any(exit_phrase in user_question_lower for exit_phrase in ["exit", "quit", "i want to quit"]):
             exit_message = "Thank you for using the Interactive PDF Chatbot. Goodbye!"
+            print("\nChatbot:", exit_message)
             text_to_speech(exit_message, input_mode)
             break
         
@@ -166,20 +193,20 @@ def chat_with_pdf(vectorstore, llm, integrated_prompt, input_mode, pdf_content):
             llm_end_time = time.time()
             print(f"LLM response time: {llm_end_time - llm_start_time:.2f} seconds")
             
-            # Print the LLM response regardless of the input mode
-            print("\nChatbot:", response.content)
-            
-            text_to_speech(response.content, input_mode)
+            if input_mode == "text":
+                print("\nChatbot:", response.content)
+            else:
+                text_to_speech(response.content, input_mode)
             
             log.append({"question": user_question, "answer": response.content})
         else:
             random_topic = get_random_topic(pdf_content)
-            response = f"I couldn't find any relevant information to answer your question. Would you like to discuss {random_topic} instead?"
+            response = f"I'm sorry, but your question doesn't seem to be related to the content we're focusing on. Would you like to discuss {random_topic} instead? It's an interesting topic from the document we're exploring."
             
-            # Print the response for the case when no relevant information is found
-            print("\nChatbot:", response)
-            
-            text_to_speech(response, input_mode)
+            if input_mode == "text":
+                print("\nChatbot:", response)
+            else:
+                text_to_speech(response.content, input_mode)
         
         total_end_time = time.time()
         total_time = total_end_time - total_start_time
