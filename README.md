@@ -43,7 +43,7 @@ Welcome to the Interactive PDF Chatbot, a smart, AI-driven application that lets
 - If you chose speech mode, it will speak the answers out loud; otherwise, it will display the answers on the screen.
 
 #### 5. End the Chat: 
-- To exit the chatbot, type "exit" or "quit". Your conversation will be saved as a log file.
+- To exit the chatbot, type "exit" or "quit" or "i want to quit". Your conversation will be saved as a log file.
 
 # Example
 Here’s a simple walkthrough of how a conversation might go:
